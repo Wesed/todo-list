@@ -155,31 +155,26 @@ function App() {
   const [countComplete, setCountComplete] = useState([0, 0])
 
   useEffect(() => {
-    // qd completar, preciso alterar isso no setTasks
-    // console.log(tasks[0].id === 1 ? 'oi' : 'tchau');
     const completed = tasks.filter(task => task.isCompleteValue === true)
-    // console.log('aaa', completed);
-    setCountComplete([0, tasks.length]);
+    setCountComplete([completed.length, tasks.length]);
 
   }, [tasks]);
 
   const handleComplete = (idComplete: number) => {
-
-    const taskIndex = tasks.findIndex((task) => {
-      return task.id == idComplete;
-    });
-
-    const newArray = tasks;
-    newArray[taskIndex].isCompleteValue = !newArray[taskIndex].isCompleteValue;
-
+    const newArray = tasks.map((task) => {
+      if(task.id == idComplete) {
+        task.isCompleteValue = !task.isCompleteValue;
+      }
+      return task;
+    })
     setTasks(newArray);
   }
 
   const handleDelete = (id: number) => {
     const newArray = tasks.filter(task => task.id !== id)
-    console.log(newArray);
     setTasks(newArray);
   }
+
 
 
   return (
