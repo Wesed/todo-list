@@ -157,8 +157,8 @@ function App() {
       isCompleteValue: false
     }
 
-    console.log(taskToAdd);
     setTasks([...tasks, taskToAdd])
+    setNewTask('');
   }
   
 
