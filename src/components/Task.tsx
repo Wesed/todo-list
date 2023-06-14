@@ -39,26 +39,28 @@ const Container = styled.div`
   }
 `;
 
-interface TaskType {
-  id: number;
+export interface TaskType {
+  id: string;
   description: string;
   isCompleteValue: boolean;
-  onHandleComplete: (idComplete: number) => void;
-  onDeleteTask: (id: number) => void;
 }
 
-export function Task({id, description, isCompleteValue, onHandleComplete, onDeleteTask}: TaskType) {
-  const [isComplete, setIsComplete] = useState(false);
+interface TaskProps {
+  task: TaskType;
+  onHandleComplete: (idComplete: string) => void;
+  onDeleteTask: (id: string) => void;
+}
 
-  useEffect(()=>{
-    setIsComplete(isCompleteValue)
-  }, [isCompleteValue]);
+export function Task({task, onHandleComplete, onDeleteTask}: TaskProps) {
+
+  console.log(task);
+
 
   return (
     <Container>
       <label> 
-        <input name="checkbox" id="checkbox" type="checkbox" onClick={()=>{onHandleComplete(id)}}/>
-        {isComplete ?
+        <input name="checkbox" id="checkbox" type="checkbox" onClick={()=>{onHandleComplete(task.id)}}/>
+        {task.isCompleteValue ?
           <CheckCircle size={24} 
             color={`var(--purple-dark)`}
             weight="fill"
@@ -66,10 +68,9 @@ export function Task({id, description, isCompleteValue, onHandleComplete, onDele
           :
           <Circle size={24} color={`var(--blue)`}/>
         }
-        <p className={`${isComplete && 'isCompleted'}`}>{description}</p>
+        <p className={`${task.isCompleteValue && 'isCompleted'}`}>{task.description}</p>
       </label>
-      <button name="delete-task" title="Deletar tarefa" onClick={()=>{onDeleteTask(id)}}> <Trash size={24}/> </button>
-      <span> {id} </span>
+      <button name="delete-task" title="Deletar tarefa" onClick={()=>{onDeleteTask(task.id)}}> <Trash size={24}/> </button>
     </Container>
   )
 }

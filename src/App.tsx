@@ -4,7 +4,7 @@ import { styled } from 'styled-components'
 import {ReactComponent as Logo } from './assets/logo.svg'
 import { PlusCircle, ClipboardText  } from "@phosphor-icons/react"
 import { useEffect, useState } from 'react';
-import { Task } from './components/Task';
+import { Task, TaskType } from './components/Task';
 import uuid from 'react-uuid'
 
 const Header = styled.header`
@@ -25,7 +25,7 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const NewTask = styled.div` 
+const NewTask = styled.form` 
   margin-top: -4%;
   display: flex;
   gap: 1rem;
@@ -98,6 +98,7 @@ const AllTasks = styled.div`
 `;
 
 const EmptyTasks = styled.div`
+  width: 100%;
   border-radius: 8px;
   border-top: 1px solid var(--gray-400);
   color: var(--gray-300);
@@ -120,47 +121,20 @@ const EmptyTasks = styled.div`
 `;
 
 function App() {
-  const [tasks, setTasks] = useState([
-    {
-      // id: uuid(),
-      id: 1,
-      description: 'Integer urna interdum massa libero auctor neque turpis turpis semper. Duis vel sed fames integer.',
-      isCompleteValue: false
-    },
-    {
-      // id: uuid(),
-      id: 2,
-      description: 'Integer urna interdum massa libero auctor neque turpis turpis semper. Duis vel sed fames integer.',
-      isCompleteValue: false
-    },
-    {
-      // id: uuid(),
-      id: 3,
-      description: 'Integer urna interdum massa libero auctor neque turpis turpis semper. Duis vel sed fames integer.',
-      isCompleteValue: false
-    },
-    {
-      // id: uuid(),
-      id: 4,
-      description: 'Integer urna interdum massa libero auctor neque turpis turpis semper. Duis vel sed fames integer.',
-      isCompleteValue: true
-    },
-    {
-      // id: uuid(),
-      id: 5,
-      description: 'Integer urna interdum massa libero auctor neque turpis turpis semper. Duis vel sed fames integer.',
-      isCompleteValue: true
-    },
-  ]);
+  
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [countComplete, setCountComplete] = useState([0, 0])
+  const [newTask, setNewTask] = useState('')
 
   useEffect(() => {
-    const completed = tasks.filter(task => task.isCompleteValue === true)
-    setCountComplete([completed.length, tasks.length]);
+    if (tasks) {
+      const completed = tasks.filter(task => task.isCompleteValue === true)
+      setCountComplete([completed.length, tasks.length]);
+    }
 
   }, [tasks]);
 
-  const handleComplete = (idComplete: number) => {
+  const handleComplete = (idComplete: string) => {
     const newArray = tasks.map((task) => {
       if(task.id == idComplete) {
         task.isCompleteValue = !task.isCompleteValue;
@@ -170,11 +144,23 @@ function App() {
     setTasks(newArray);
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     const newArray = tasks.filter(task => task.id !== id)
     setTasks(newArray);
   }
 
+  const handleSubmit = () => {
+    event?.preventDefault();
+    const taskToAdd = {
+      id: uuid(),
+      description: newTask,
+      isCompleteValue: false
+    }
+
+    console.log(taskToAdd);
+    setTasks([...tasks, taskToAdd])
+  }
+  
 
 
   return (
@@ -182,9 +168,10 @@ function App() {
       <Header>
         <Logo />
       </Header>
+
       <Container>
-        <NewTask>
-          <input type="text" placeholder="Adicione uma nova tarefa" />
+        <NewTask onSubmit={handleSubmit}>
+          <input type="text" placeholder="Adicione uma nova tarefa" value={newTask} onChange={({target})=>{setNewTask(target.value)}}/>
           <button>
             Criar
             <PlusCircle size={32} />
@@ -194,15 +181,16 @@ function App() {
         <TaskContainer>
           <TitleTask className="blue">
             Tarefas criadas
-            <span>0</span>
+            <span>{tasks.length}</span>
           </TitleTask>
 
           <TitleTask className="purple">
             Concluídas
             <span>
-              {countComplete[1] == 0
-                ? 0
-                : `${countComplete[0]} de ${countComplete[1]}`}
+              {countComplete[1] == 0 ? 0
+                : 
+                `${countComplete[0]} de ${countComplete[1]}`
+              }
             </span>
           </TitleTask>
 
@@ -212,9 +200,7 @@ function App() {
                 return (
                   <Task
                     key={task.id}
-                    id={task.id}
-                    description={task.description}
-                    isCompleteValue={task.isCompleteValue}
+                    task={task}
                     onHandleComplete={handleComplete}
                     onDeleteTask={handleDelete}
                   />
